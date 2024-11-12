@@ -132,9 +132,27 @@
                                      <td>{{ $category->id }}</td>
                                      <td>{{ $category->name }}</td>
                                      <td>{{ \Carbon\Carbon::parse($category->created_at)->format('Y-m-d') }}</td>
-                                     <td>
-                                        <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-primary">Edit</a>
-                                        <a href="{{ route('categories.destroy', $category->id) }}" class="btn btn-danger">Delete</a>
+                                     <td class="d-flex">
+                                        <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-primary me-2">Edit</a>
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $category->id }}">
+                                            Delete
+                                        </button>
+                                        <div class="modal fade" id="deleteModal{{ $category->id }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel">Delete Category</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete this category?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <form action="{{ route('categories.destroy', $category->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger">Delete</button>
                                      </td>
                                     </tr>
                                     @endforeach

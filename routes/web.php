@@ -25,5 +25,5 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-Route::resource(name: 'products', controller: ProductController::class);
-Route::resource(name: 'categories', controller: CategoryController::class);
+Route::resource(name: 'products', controller: ProductController::class)->middleware(['auth']);
+Route::resource(name: 'categories', controller: CategoryController::class)->middleware(['auth']);

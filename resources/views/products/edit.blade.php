@@ -107,37 +107,38 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Create Product</li>
+                                <li class="breadcrumb-item active" aria-current="page">Edit Product</li>
                             </ol>
                         </nav>
                     </div>
-                    <h1>Create Product</h1>
+                    <h1>Edit Product</h1>
                 </div>
                 <div class="col-12">
 
-                        <form action="{{ route('products.store') }}" method="POST">
+                        <form action="{{ route('products.update', $product->id) }}" method="POST">
                         @csrf
+                        @method('PUT')
                         <div class="mb-3">
                             <label for="name" class="form-label">Product Name - (اسم المنتج)</label>
-                            <input type="text" class="form-control" id="name" name="name" required placeholder="Product Name">
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="Product Name" value="{{ $product->name }}">
                         </div>
                         <div class="mb-3">
                             <label for="code" class="form-label">Product Cod - (كود المنتج)</label>
-                            <input type="text" class="form-control" id="code" name="code" required placeholder="Product Code"   >
+                            <input type="text" class="form-control" id="code" name="code" required placeholder="Product Code"   value="{{ $product->code }}">
                         </div>
                         <div class="mb-3">
                             <label for="wholesale_price" class="form-label">Wholesale Price - (سعر الجملة)</label>
-                            <input type="number" class="form-control" id="wholesale_price" name="wholesale_price" required placeholder="Wholesale Price"    >
+                            <input type="number" class="form-control" id="wholesale_price" name="wholesale_price" required placeholder="Wholesale Price"    value="{{ $product->wholesale_price }}">
                         </div>
                         <div class="mb-3">
                             <label for="sale_price" class="form-label">Sale Price - (سعر البيع)</label>
-                            <input type="number" class="form-control" id="sale_price" name="sale_price" required placeholder="Sale Price"    >
+                            <input type="number" class="form-control" id="sale_price" name="sale_price" required placeholder="Sale Price"    value="{{ $product->sale_price }}">
                         </div>
                         <div class="mb-3">
                             <label for="category_id" class="form-label">Category - (القسم)</label>
                             <select class="form-control" id="category_id" name="category_id" required>
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    <option value="{{ $category->id }}" {{ $product->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                 @endforeach
                             </select>
                         </div>
