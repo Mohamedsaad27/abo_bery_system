@@ -55,4 +55,20 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Product deleted successfully');
     }
+    // ProductsController.php
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $products = Product::where('name', 'LIKE', '%' . $query . '%')
+                          ->orWhere('code', 'LIKE', '%' . $query . '%')
+                          ->with('category')
+                          ->get();
+    
+        if($request->ajax()) {
+            return response()->json($products);
+        }
+    
+        return view('products.index', compact('products'));
+    }
+
 }

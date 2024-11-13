@@ -120,9 +120,10 @@
                                 <thead class="thead-light">
                                     <tr>
                                         <th class="border-0 rounded-start">#</th>
-                                        <th class="border-0">Category Name</th>
-                                        <th class="border-0">Created At</th>
-                                        <th class="border-0 rounded-end">Action</th>
+                                        <th class="border-0">Category Name - (اسم الصنف)</th>
+                                        <th class="border-0">Products Count - (عدد المنتجات)</th>
+                                        <th class="border-0">Created At - (تاريخ الإنشاء)</th>
+                                        <th class="border-0 rounded-end">Action - (العملية)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -130,7 +131,8 @@
                                     @foreach ($categories as $category)
                                     <tr>
                                      <td>{{ $category->id }}</td>
-                                     <td>{{ $category->name }}</td>
+                                     <td>{{ $category->name  ?? 'N/A' }}</td>
+                                     <td>{{ $category->products()->count() }}</td>
                                      <td>{{ \Carbon\Carbon::parse($category->created_at)->format('Y-m-d') }}</td>
                                      <td class="d-flex">
                                         <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-primary me-2">Edit</a>

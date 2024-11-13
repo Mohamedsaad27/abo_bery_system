@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,7 +11,7 @@
     <meta name="description" content="Volt Pro is a Premium Bootstrap 5 Admin Dashboard featuring over 800 components, 10+ plugins and 20 example pages using Vanilla JS.">
     <meta name="keywords" content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, themesberg, themesberg dashboard, themesberg admin dashboard" />
     <link rel="canonical" href="https://themesberg.com/product/admin-dashboard/volt-premium-bootstrap-5-dashboard">
-    
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://demo.themesberg.com/volt-pro">
@@ -89,7 +88,7 @@
                             Upload Files
                         </a>
                         <a class="dropdown-item d-flex align-items-center" href="#">
-                            <svg class="dropdown-icon text-gray-400 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            <svg class="dropdown-icon text-gray-400 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166.32.166.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                             Preview Security
                         </a>
                         <div role="separator" class="dropdown-divider my-1"></div>
@@ -114,6 +113,20 @@
                     <h1>Products</h1>
                 </div>
                 <div class="card border-0 shadow mb-4">
+                    <div class="d-flex align-items-center mt-3">
+                        <!-- Search form -->
+                        <form action="{{ route('products.search') }}" method="GET" class="navbar-search form-inline" id="navbar-search-main">
+                            <div class="input-group input-group-merge search-bar">
+                                <span class="input-group-text" id="topbar-addon">
+                                    <svg class="icon icon-xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                                <input type="text" class="form-control" id="topbarInputIconLeft" name="query" placeholder="Search" aria-label="Search" aria-describedby="topbar-addon">
+                            </div>
+                        </form>
+                        <!-- / Search form -->
+                      </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-centered table-nowrap mb-0 rounded">
@@ -129,7 +142,7 @@
                                         <th class="border-0 rounded-end">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="productTable">
                                     <!-- Item -->
                                     @foreach ($products as $product)
                                     <tr>
@@ -180,6 +193,8 @@
 <!-- Core -->
 <script src="{{asset('assets/vendor/popperjs/core/dist/umd/popper.min.js')}}"></script>
 <script src="{{asset('assets/vendor/bootstrap/dist/js/bootstrap.min.js')}}"></script>
+        
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
 <!-- Vendor JS -->
 <script src="{{asset('assets/vendor/onscreen/dist/on-screen.umd.min.js')}}"></script>
@@ -217,7 +232,66 @@
 
 <!-- Volt JS -->
 <script src="{{asset('assets/js/volt.js')}}"></script>
-    
+<script>
+    $(document).ready(function() {
+        $('#topbarInputIconLeft').on('keyup', function() {
+            var query = $(this).val();
+            
+            $.ajax({
+                url: '{{ route('products.search') }}',
+                method: 'GET',
+                data: { query: query },
+                success: function(products) {
+                    let rows = '';
+                    products.forEach(function(product) {
+                        rows += `
+                            <tr>
+                                <td>${product.id}</td>
+                                <td>${product.name}</td>
+                                <td>${product.code}</td>
+                                <td>${product.wholesale_price}</td>
+                                <td>${product.sale_price}</td>
+                                <td>${product.category ? product.category.name : 'N/A'}</td>
+                                <td>${moment(product.created_at).format('YYYY-MM-DD')}</td>
+                                <td class="d-flex">
+                                    <a href="/products/${product.id}/edit" class="btn btn-primary me-2">Edit</a>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal${product.id}">
+                                        Delete
+                                    </button>
+                                    <div class="modal fade" id="deleteModal${product.id}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="deleteModalLabel">Delete Product</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Are you sure you want to delete this product?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <form action="/products/${product.id}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    $('#productTable').html(rows);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+    </script>
 </body>
 
 </html>
